@@ -105,11 +105,8 @@ func main() {
 
 	// Initialize a session that the SDK will use to load credentials
 	// from the shared credentials file ~/.aws/credentials.
-	sess, err := session.NewSession()
-	if err != nil {
-		fmt.Printf("Error creating session: %s\n", err)
-		os.Exit(1)
-	}
+	sess := session.Must(session.NewSession())
+
 	// Create S3 service client
 	svc := s3.New(sess)
 
@@ -117,9 +114,11 @@ func main() {
 	// for more information on configuring part size, and concurrency.
 	//
 	// http://docs.aws.amazon.com/sdk-for-go/api/service/s3/s3manager/#NewUploader
-	uploader = s3manager.NewUploader(sess)
+	uploader = s3manager.NewUploader(sess, func(u *s3manager.Uploader) {
+		u.MaxUploadParts = 1 * 1000 * 1000
+	})
 
-	err = getBucketContents(svc, "allanmh-backup")
+	err := getBucketContents(svc, "allanmh-backup")
 	if err != nil {
 		fmt.Printf("Error getting bucket contents: %s\n", err)
 		os.Exit(1)
