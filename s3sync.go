@@ -80,7 +80,9 @@ func transferDir(dir string) (err error) {
 
 func getBucketContents(svc *s3.S3, bucket string) (err error) {
 	// Get the list of items
-	err = svc.ListObjectsV2Pages(&s3.ListObjectsV2Input{Bucket: aws.String(bucket)},
+	err = svc.ListObjectsV2Pages((&s3.ListObjectsV2Input{
+		Bucket: aws.String(bucket),
+	}).SetEncodingType(s3.EncodingTypeUrl),
 		func(page *s3.ListObjectsV2Output, lastPage bool) bool {
 			for _, item := range page.Contents {
 				fileMap[*item.Key] = *item.Size
