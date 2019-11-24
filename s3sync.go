@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"path/filepath"
 
@@ -85,7 +86,13 @@ func getBucketContents(svc *s3.S3, bucket string) (err error) {
 	}).SetEncodingType(s3.EncodingTypeUrl),
 		func(page *s3.ListObjectsV2Output, lastPage bool) bool {
 			for _, item := range page.Contents {
-				fileMap[*item.Key] = *item.Size
+				fn, err := url.QueryUnescape(*item.Key)
+				if err != nil {
+					fmt.Printf("Error in QueryUnescape(%s): %s",
+						*item.Key, err)
+					continue
+				}
+				fileMap[fn] = *item.Size
 			}
 
 			return true
