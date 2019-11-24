@@ -66,14 +66,15 @@ func transferDir(dir string) (err error) {
 		if file.IsDir() {
 			err := transferDir(fn)
 			if err != nil {
-				fmt.Printf("Error reading directory %s: %s",
+				fmt.Printf("Error reading directory %s: %s\n",
 					fn, err)
 			}
 			continue
 		}
 		err := transferFile(fn)
 		if err != nil {
-			return err
+			fmt.Printf("Error reading file %s: %s\n", fn, err)
+			continue
 		}
 	}
 	return nil
